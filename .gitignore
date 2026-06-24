@@ -1,0 +1,17 @@
+# Build Artifacts
+ZeroShadow
+src/*.o
+*.o
+
+# Directories
+runtime/
+tests/
+
+# VS Code Metadata
+.vscode/
+
+# System Files
+.DS_Store
+*.swp
+*.swo
+*~
