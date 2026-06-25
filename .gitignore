@@ -2,10 +2,13 @@
 ZeroShadow
 src/*.o
 *.o
+libzeroshadow.so
+zeroshadow-sdk-v1.0.0-alpha.zip
 
 # Directories
 runtime/
 tests/
+zeroshadow-sdk/
 
 # VS Code Metadata
 .vscode/
@@ -15,3 +18,4 @@ tests/
 *.swp
 *.swo
 *~
+
