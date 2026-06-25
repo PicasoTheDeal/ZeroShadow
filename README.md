@@ -1,3 +1,5 @@
+[![CodeQL Security Scan](https://github.com/PicasoTheDeal/ZeroShadow/actions/workflows/codeql.yml/badge.svg)](https://github.com/PicasoTheDeal/ZeroShadow/actions/workflows/codeql.yml)
+
 # ZeroShadow
 
 ZeroShadow is a low-level Linux user-space supervisor enforcing coarse-grained Control-Flow Integrity (CFI). It uses `ptrace` to single-step target threads, validating the instruction pointer (`RIP`) against known-executable memory boundaries dynamically extracted from `/proc/[pid]/maps`. Any execution jump to an unauthorized region (stack, heap, unmapped) results in immediate termination.
@@ -43,6 +45,25 @@ Requires a C++17 compiler and a Linux kernel (4.11+) supporting process_vm_write
 ```bash
 make
 ```
+
+## Security Architecture & Permissions
+
+ZeroShadow operates as a low-level instrumentation engine. To maintain a verifiable ring of trust, the system boundaries and privileges are strictly mapped out below.
+
+### Required Linux Capabilities
+* **`CAP_SYS_PTRACE`**: Required if tracing external, already-running processes. ZeroShadow uses standard Linux process tracing mechanisms to read memory maps (`/proc/[pid]/maps`) and hook execution vectors. 
+* **Root Privileges**: `sudo` is only required if the target binary being analyzed requires root privileges itself, or when attaching to a process owned by another user.
+
+### What the Engine Does NOT Do
+* **No Network I/O**: The core engine (`libzeroshadow.so`) contains zero networking libraries. It cannot make external calls; phoning home is structurally impossible.
+* **No Arbitrary Persistence**: ZeroShadow does not write to system directories, modify initialization scripts, or create background daemons.
+
+### Modular Structure
+The codebase is decoupled into isolated, single-responsibility modules to ensure transparent code audits:
+1. `src/elf_parser.cpp`: Purely reads and maps ELF structures into memory. It possesses no execution or tracing logic.
+2. `src/tracer.cpp`: Handles the low-level breakpoint placement and registers tracking. It relies entirely on the parsed data from the parser.
+3. `src/main.cpp`: The CLI interface wrapper that drives the underlying modules.
+
 ```bash
 .
 ├── include
