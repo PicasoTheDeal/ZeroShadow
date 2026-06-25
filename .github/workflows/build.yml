@@ -1,0 +1,42 @@
+name: ZeroShadow Build Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Compile Core Engine (.so)
+      run: |
+        g++ -shared -fPIC -I./include src/elf_parser.cpp src/tracer.cpp -o libzeroshadow.so
+        
+    - name: Compile CLI Executable
+      run: |
+        g++ -I./include src/main.cpp -L. -lzeroshadow -o ZeroShadow
+
+    - name: Generate SHA256 Checksums
+      run: |
+        sha256sum libzeroshadow.so > libzeroshadow.so.sha256
+        sha256sum ZeroShadow > ZeroShadow.sha256
+        echo "=== CHECKSUMS ==="
+        cat libzeroshadow.so.sha256
+        cat ZeroShadow.sha256
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: zeroshadow-compiled-binaries
+        path: |
+          libzeroshadow.so
+          ZeroShadow
+          *.sha256
