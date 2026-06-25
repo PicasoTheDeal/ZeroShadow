@@ -55,3 +55,8 @@ make
     ├── main.cpp         # entry point and argument routing
     └── tracer.cpp       # ptrace loop, syscall interception, and CFI enforcement
 ```
+
+## The Journey / Build Process
+
+* **Start of the build:** [Post #313](https://t.me/Tetstack/313)
+* **Finalizing the Alpha:** [Post #437](https://t.me/Tetstack/437)
